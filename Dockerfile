@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM node:alpine AS front-builder
+FROM --platform=linux/arm64 node:alpine AS front-builder
 WORKDIR /app
 COPY frontend/ ./
 RUN npm install && npm run build
@@ -19,6 +19,9 @@ LABEL org.opencontainers.image.authors="alireza7@gmail.com"
 ENV TZ=Asia/Tehran
 WORKDIR /app
 RUN apk add  --no-cache --update ca-certificates tzdata
+RUN sysctl -w net.ipv6.conf.all.disable_ipv6=0
+RUN sysctl -w net.ipv6.conf.default.disable_ipv6=0
+RUN sysctl -w net.ipv6.conf.lo.disable_ipv6=0
 COPY --from=backend-builder  /app/sui /app/
 COPY entrypoint.sh /app/
 VOLUME [ "s-ui" ]
